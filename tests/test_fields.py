@@ -2494,6 +2494,10 @@ class FieldTest(unittest.TestCase):
         self.assertEquals(result[0].name, "bar")
         self.assertEquals(result[1].name, "baz")
 
+        # don't misinterpret 0x1 as IPv4
+        host4 = Host(name="fail")
+        host4.ip = IP("0x1")
+
         # fail on wrong IP version
         host4 = Host(name="fail")
         host4.ip = IP("192.168.0.1")
