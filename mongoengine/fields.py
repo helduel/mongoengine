@@ -1466,7 +1466,7 @@ class IPField(BaseField):
     def __get__(self, instance, owner):
         value = super(IPField, self).__get__(instance, owner)
         if value is not None:
-            value = IP(value)
+            value = IP(value, self.v)
         return value
 
     def validate(self, value):

@@ -2463,6 +2463,11 @@ class FieldTest(unittest.TestCase):
         host2 = Host(name="bar", ip=IP(ip2))
         host2.save()
 
+        # don't switch to ipv4
+        ip3 = "0x1"
+        host3 = Host(name="baz", ip=ip3)
+        self.assertEquals(host3.ip.version(), 6)
+
         # search with IP object
         result = Host.objects(ip=IP(ip1))
         self.assertEquals(len(result), 1)
