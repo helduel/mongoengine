@@ -1525,19 +1525,19 @@ class IPNetworkField(BaseField):
         value = IP(value)
         if self.v == 4:
             return {
-                "net$prefix": value.prefixlen(),
-                "net$lower": value[0].int(),
-                "net$upper": value[-1].int(),
+                "net!prefix": value.prefixlen(),
+                "net!lower": value[0].int(),
+                "net!upper": value[-1].int(),
             }
         return {
-            "net$prefix": value.prefixlen(),
-            "net$lower": value[0].strHex(),
-            "net$upper": value[-1].strHex(),
+            "net!prefix": value.prefixlen(),
+            "net!lower": value[0].strHex(),
+            "net!upper": value[-1].strHex(),
         }
 
     def to_python(self, value):
         if isinstance(value, dict):
-            value = "%s/%i" % (value["net$lower"], value["net$prefix"])
+            value = "%s/%i" % (value["net!lower"], value["net!prefix"])
         return IP(value)
 
     def prepare_query_value(self, op, value):
@@ -1547,8 +1547,8 @@ class IPNetworkField(BaseField):
             value = IP(value).strHex()
         if op == "contains":
             value = {
-                "net$lower": {"$lte": value},
-                "net$upper": {"$gte": value},
+                "net!lower": {"$lte": value},
+                "net!upper": {"$gte": value},
             }
         return value
 
