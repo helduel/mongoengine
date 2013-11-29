@@ -1522,7 +1522,7 @@ class IPNetworkField(BaseField):
             self.error("IP version mismatch")
 
     def to_mongo(self, value):
-        value = IP(value)
+        value = IP(value, self.v)
         if self.v == 4:
             return {
                 "net!prefix": value.prefixlen(),
@@ -1538,13 +1538,13 @@ class IPNetworkField(BaseField):
     def to_python(self, value):
         if isinstance(value, dict):
             value = "%s/%i" % (value["net!lower"], value["net!prefix"])
-        return IP(value)
+        return IP(value, self.v)
 
     def prepare_query_value(self, op, value):
         if self.v == 4:
-            value = IP(value).int()
+            value = IP(value, self.v).int()
         else:
-            value = IP(value).strHex()
+            value = IP(value, self.v).strHex()
         if op == "contains":
             value = {
                 "net!lower": {"$lte": value},
