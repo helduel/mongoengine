@@ -690,12 +690,24 @@ class QuerySet(object):
         return fields
 
     @classmethod
-    def _translate_field_name(cls, doc_cls, field, sep='.'):
+    def _translate_field_name(cls, doc_cls, field, sep='.', for_ordering=False):
         """Translate a field attribute name to a database field name.
         """
+        from .fields import IPNetworkField
         parts = field.split(sep)
-        parts = [f.db_field for f in QuerySet._lookup_field(doc_cls, parts)]
-        return '.'.join(parts)
+        new_parts = list()
+        for field in QuerySet._lookup_field(doc_cls, parts):
+            new_parts.append(field.db_field)
+            if isinstance(field, IPNetworkField):
+                new_parts.append("net!lower")
+                key = ".".join(new_parts)
+                new_parts[-1] = "net!upper"
+                additional = ".".join(new_parts)
+                return (key, additional)
+        name = '.'.join(new_parts)
+        if for_ordering:
+            return (name, None)
+        return name
 
     @classmethod
     def _transform_query(cls, _doc_cls=None, _field_operation=False, **query):
@@ -1371,11 +1383,16 @@ class QuerySet(object):
             if key[0] in ('-', '+'):
                 key = key[1:]
             key = key.replace('__', '.')
+            additional = None
             try:
-                key = QuerySet._translate_field_name(self._document, key)
+                (key, additional) = QuerySet._translate_field_name(
+                    self._document, key, for_ordering=True
+                )
             except:
                 pass
             key_list.append((key, direction))
+            if additional:
+                key_list.append((additional, direction))
 
         self._ordering = key_list
 

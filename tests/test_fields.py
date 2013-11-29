@@ -2555,6 +2555,18 @@ class FieldTest(unittest.TestCase):
         self.assertEquals(len(result), 1)
         self.assertEquals(result[0].name, "foo")
 
+        # sort network
+        network3 = "172.30.0.0/24"
+        site3 = Site(name="baz", network=IP(network3))
+        site3.save()
+        result = Site.objects().order_by("network")
+        nets = [site.name for site in result]
+        self.assertEquals(nets, [u"baz", u"bar", u"foo"])
+        # reverse
+        result = Site.objects().order_by("-network")
+        nets = [site.name for site in result]
+        self.assertEquals(nets, [u"foo", u"bar", u"baz"])
+
     def test_ipv6_network_field(self):
         """Ensure that an IPv6 network field works as expected.
         """
