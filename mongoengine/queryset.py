@@ -789,7 +789,7 @@ class QuerySet(object):
                                 else:
                                     mongo_query_and(contains_query)
                                 continue
-                            parts.append("net$lower")
+                            parts.append("net!lower")
                 elif op in ('in', 'nin', 'all', 'near'):
                     # 'in', 'nin' and 'all' require a list of values
                     if isinstance(value, IP):
